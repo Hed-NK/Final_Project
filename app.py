@@ -5,15 +5,15 @@ import numpy as np
 import altair as alt
 
 # Page Title
-st.set_page_config(page_title='Infectious Diseases Exploratory Data Analysis', page_icon='🦠', layout='wide', initial_sidebar_state="expanded")
-st.title('🦠 Infectious Diseases Explatory Data Analysis')
+st.set_page_config(page_title='COVID-19 Exploratory Data Analysis', page_icon='🦠', layout='wide', initial_sidebar_state="expanded")
+st.title('🦠 COVID-19 Explatory Data Analysis')
 
 # App Description
 with st.expander('About this app'):
     st.markdown('What can this app do?')
-    st.info('This application presents three types of interactive visualizations. Bar Plot: Illustrates COVID-19 cases across different countries, color-coded by continent for easy comparison. Scatter Plot: Displays the relationship between COVID-19 deaths and cases, also color-coded by continent for clarity. Pie Chart: Provides a proportional view of COVID-19 cases, with segments color-coded by continent. Additionally, the app includes user-friendly sidebar filters, featuring sliders and dropdown menus to customize the data visualizations dynamically.')
+    st.info('This application presents twelve types of interactive visualizations. Bar Plot of Deaths per Country color coded by Continent. Scatter Plot of Recovered per cases color coded by Country. Pie Chart of Active cases distribution color coded by Continent. Histogram of Critical cases per overall cases color coded by Country. Heatmap of Active cases per overall cases color coded by Continent. Bubble Chart of cases per Recovered by continent and Population Size. 3D Scatter Plot of COVID-19 Cases, Deaths, and Recovered color coded by continent. Pair Plot of COVID-19 Data color coded by continent. Cluster World Map of COVID-19 Data by case numbers. Facet Grid of cases per Deaths by Continent. Joint Plot of Critical cases per Tests by Continent. Additionally, the app includes user-friendly dropdown menus to customize the data visualizations dynamically.')
     st.markdown('How to use this app?')
-    st.info('The application includes intuitive sidebar filters, featuring sliders to adjust the number of COVID-19 cases, deaths, recoveries, and critical patients. Users can also select specific countries or continents using dropdown menus. Adjusting these filters dynamically updates the visualizations. Bar Plot: Clicking on any bar reveals the country name along with the corresponding number of COVID-19 cases, deaths, recoveries, and critical patients. Scatter Plot: Interacting with any scatter point displays detailed information, including the country name and the number of COVID-19 cases, deaths, recoveries, and critical patients. Pie Chart: Hovering over any segment of the pie chart shows the continent, country name, and the number of COVID-19 cases.')
+    st.info('Users can select specific countries or continents using dropdown menus. Adjusting these filters dynamically updates the visualizations.')
 
 # Project Description
 with st.expander('Project Objectives'):
@@ -22,110 +22,122 @@ with st.expander('Project Objectives'):
 
 # Load Data
 df = pd.read_csv('infectious_diseases_data.csv')
+df = df.dropna(subset=['continent'])
 
 # Country Selection - Dropdown Menu
 Country_list = df.country.unique()
-Country_selection = st.multiselect('Select Countries', Country_list, ['Afghanistan', 'Albania' ,'Algeria' ,'Andorra', 'Angola', 'Anguilla',
- 'Antigua and Barbuda' ,'Argentina' ,'Armenia' ,'Aruba' ,'Australia', 'Austria',
- 'Azerbaijan', 'Bahamas' ,'Bahrain', 'Bangladesh', 'Barbados' ,'Belarus',
- 'Belgium', 'Belize', 'Benin', 'Bermuda', 'Bhutan', 'Bolivia', 'Bosnia',
- 'Botswana', 'Brazil', 'British Virgin Islands', 'Brunei', 'Bulgaria',
- 'Burkina Faso', 'Burundi' ,'Cabo Verde', 'Cambodia' ,'Cameroon', 'Canada',
- 'Caribbean Netherlands' ,'Cayman Islands' ,'Central African Republic',
- 'Chad', 'Channel Islands' ,'Chile' ,'China', 'Colombia', 'Comoros', 'Congo',
- 'Cook Islands', 'Costa Rica' ,'Croatia' ,'Cuba', 'Curaçao', 'Cyprus', 'Czechia',
- "Côte d'Ivoire" ,'DRC', 'Denmark', 'Diamond Princess', 'Djibouti', 'Dominica',
- 'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador', 'Equatorial Guinea',
- 'Eritrea', 'Estonia', 'Ethiopia' ,'Falkland Islands (Malvinas)',
- 'Faroe Islands' ,'Fiji', 'Finland' ,'France' ,'French Guiana',
- 'French Polynesia', 'Gabon', 'Gambia', 'Georgia', 'Germany', 'Ghana',
- 'Gibraltar', 'Greece' ,'Greenland', 'Grenada', 'Guadeloupe', 'Guatemala',
- 'Guinea', 'Guinea-Bissau', 'Guyana', 'Haiti', 'Holy See (Vatican City State)',
- 'Honduras', 'Hong Kong', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran',
- 'Iraq', 'Ireland' ,'Isle of Man' ,'Israel', 'Italy', 'Jamaica', 'Japan',
- 'Jordan' ,'Kazakhstan', 'Kenya', 'Kiribati' ,'Kuwait', 'Kyrgyzstan',
- "Lao People's Democratic Republic", 'Latvia' ,'Lebanon', 'Lesotho', 'Liberia',
- 'Libyan Arab Jamahiriya' ,'Liechtenstein', 'Lithuania' ,'Luxembourg',
- 'MS Zaandam', 'Macao' ,'Macedonia' ,'Madagascar', 'Malawi', 'Malaysia',
- 'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Martinique' ,'Mauritania',
- 'Mauritius', 'Mayotte', 'Mexico' ,'Micronesia', 'Moldova' ,'Monaco' ,'Mongolia',
- 'Montenegro', 'Montserrat', 'Morocco', 'Mozambique' ,'Myanmar', 'N. Korea',
- 'Namibia', 'Nauru' ,'Nepal' ,'Netherlands' ,'New Caledonia' ,'New Zealand',
- 'Nicaragua' ,'Niger', 'Nigeria', 'Niue', 'Norway', 'Oman', 'Pakistan' ,'Palau',
- 'Palestine', 'Panama' ,'Papua New Guinea' ,'Paraguay' ,'Peru', 'Philippines',
- 'Poland', 'Portugal' ,'Qatar', 'Romania' ,'Russia', 'Rwanda', 'Réunion',
- 'S. Korea', 'Saint Helena', 'Saint Kitts and Nevis' ,'Saint Lucia',
- 'Saint Martin' ,'Saint Pierre Miquelon', 'Saint Vincent and the Grenadines',
- 'Samoa', 'San Marino', 'Sao Tome and Principe', 'Saudi Arabia', 'Senegal',
- 'Serbia', 'Seychelles', 'Sierra Leone' ,'Singapore' ,'Sint Maarten',
- 'Slovakia' ,'Slovenia', 'Solomon Islands', 'Somalia' ,'South Africa',
- 'South Sudan', 'Spain', 'Sri Lanka', 'St. Barth', 'Sudan', 'Suriname',
- 'Swaziland', 'Sweden', 'Switzerland', 'Syrian Arab Republic' ,'Taiwan',
- 'Tajikistan' ,'Tanzania' ,'Thailand', 'Timor-Leste', 'Togo', 'Tokelau', 'Tonga',
- 'Trinidad and Tobago' ,'Tunisia' ,'Turkey', 'Turks and Caicos Islands',
- 'Tuvalu', 'UAE', 'UK', 'USA' ,'Uganda', 'Ukraine', 'Uruguay', 'Uzbekistan',
- 'Vanuatu', 'Venezuela' ,'Vietnam' ,'Wallis and Futuna', 'Western Sahara',
- 'Yemen', 'Zambia', 'Zimbabwe'])
+Country_selection = st.multiselect('Select Countries', Country_list, default=('Afghanistan', 'Dominican Republic', 'Kenya', 'French Polynesia', 'Czechia'))
 
 # Continent Selection - Dropdown Menu
 Continent_list = df.continent.unique()
-Continent_selection = st.multiselect('Select Continents', Continent_list, ['Asia', 'Europe', 'Africa' ,'North America', 'South America',
- 'Australia-Oceania'])
-
-# Sidebar Filters
-st.sidebar.title('Filters')
-
-# Cases - Slider
-Cases_list = df['cases']
-Cases_selection = st.sidebar.slider('Select Number of Cases', 9, 111820082, (9, 111820082))
-
-# Deaths - Slider
-Deaths_list = df['deaths']
-Deaths_selection = st.sidebar.slider('Select Number of Deaths', 0, 1219487, (0, 1219487))
-
-# Recovered - Slider
-Recovered_list = df['recovered']
-Recovered_selection = st.sidebar.slider('Select Number of Recovered', 0, 109814428, (0, 109814428))
-
-# Critical - Slider
-Critical_list = df['critical']
-Critical_selection = st.sidebar.slider('Select Number of Critical Patients', 0, 940, (0, 940))
+Continent_selection = st.multiselect('Select Continents', Continent_list, default=Continent_list)
 
 # Data Overview 
 st.write('Data Overview')
 st.write(df.describe())
 
 # Filtered Data
-filtered_df = df[ (df['country'].isin(Country_list)) 
-& (df['continent'].isin(Continent_list)) 
-& (df['cases'] <= Cases_list) 
-& (df['deaths'] <= Deaths_list) 
-& (df['recovered'] <= Recovered_list) 
-& (df['critical'] <= Critical_list) ]
+filtered_df = df[ (df['country'].isin(Country_selection)) 
+& (df['continent'].isin(Continent_selection))]
 st.write('Filtered Data', filtered_df)
 
 # Bar Chart
 chart = alt.Chart(filtered_df).mark_bar().encode(
     x='country',
-    y='cases',
+    y='deaths',
     color='continent',
-    tooltip=['country', 'cases', 'deaths', 'recovered', 'critical']
-).interactive()
+    tooltip=['country', 'cases', 'deaths', 'recovered', 'critical', 'active', 'casesPerOneMillion', 'deathsPerOneMillion', 'tests', 'testsPerOneMillion', 'population', 'oneCasePerPeople', 'oneDeathPerPeople', 'oneTestPerPeople', 'activePerOneMillion', 'recoveredPerOneMillion', 'criticalPerOneMillion']
+).interactive().properties( title='Bar Chart of Deaths per Country by Continent' )
 st.altair_chart(chart, use_container_width=True)
 
 # Scatter Plot 
 scatter_plot = alt.Chart(filtered_df).mark_circle(size=60).encode( 
     x='cases', 
-    y='deaths', 
-    color='continent', 
-    tooltip=['country', 'cases', 'deaths', 'recovered', 'critical']
-).interactive() 
+    y='recovered', 
+    color='country', 
+    tooltip=['country', 'cases', 'deaths', 'recovered', 'critical', 'active', 'casesPerOneMillion', 'deathsPerOneMillion', 'tests', 'testsPerOneMillion', 'population', 'oneCasePerPeople', 'oneDeathPerPeople', 'oneTestPerPeople', 'activePerOneMillion', 'recoveredPerOneMillion', 'criticalPerOneMillion']
+).interactive().properties( title='Scatter Plot of Recovered per Cases by Country' )
 st.altair_chart(scatter_plot, use_container_width=True)
 
-# Pie Chart for cases distribution by continent 
+# Pie Chart for active cases distribution by continent  
 pie_chart = alt.Chart(filtered_df).mark_arc().encode( 
-    theta=alt.Theta(field='cases', type='quantitative'), 
+    theta=alt.Theta(field='active', type='quantitative'), 
     color=alt.Color(field='continent', type='nominal'), 
-    tooltip=['continent', 'country', 'cases'] ).properties( width=400, height=400 ) 
+    tooltip=['continent', 'country', 'cases', 'deaths', 'recovered', 'critical', 'active', 'casesPerOneMillion', 'deathsPerOneMillion', 'tests', 'testsPerOneMillion', 'population', 'oneCasePerPeople', 'oneDeathPerPeople', 'oneTestPerPeople', 'activePerOneMillion', 'recoveredPerOneMillion', 'criticalPerOneMillion']
+ ).properties( width=400, height=400, title='Pie Chart of Active Cases distribution by Continent') 
 st.altair_chart(pie_chart, use_container_width=True)
 
+# Box Plot
+box_plot = alt.Chart(filtered_df).mark_boxplot().encode(
+    x='tests',
+    y='deaths',
+    color='country',
+    tooltip=['country', 'cases', 'deaths', 'recovered', 'critical', 'active', 'casesPerOneMillion', 'deathsPerOneMillion', 'tests', 'testsPerOneMillion', 'population', 'oneCasePerPeople', 'oneDeathPerPeople', 'oneTestPerPeople']
+).properties(
+    title='Box Plot of Deaths per Tests by Country'
+)
+st.altair_chart(box_plot, use_container_width=True)
+
+# Histogram 
+histogram = alt.Chart(filtered_df).mark_bar().encode(
+    x=alt.X('cases', bin=True),
+    y='critical',
+    color='country',
+    tooltip=['cases', 'count()','country', 'deaths', 'recovered', 'critical', 'active', 'casesPerOneMillion', 'deathsPerOneMillion', 'tests', 'testsPerOneMillion', 'population', 'oneCasePerPeople', 'oneDeathPerPeople', 'oneTestPerPeople']
+).properties(
+    title='Histogram of Critical Cases per Overall Cases'
+)
+st.altair_chart(histogram, use_container_width=True)
+
+# Heatmap 
+heatmap = alt.Chart(filtered_df).mark_rect().encode(
+    x='cases',
+    y='active',
+    color='continent',
+    tooltip=['cases', 'deaths', 'count()', 'country', 'recovered', 'critical', 'active', 'casesPerOneMillion', 'deathsPerOneMillion', 'tests', 'testsPerOneMillion', 'population', 'oneCasePerPeople', 'oneDeathPerPeople', 'oneTestPerPeople']
+).properties(
+    title='Heatmap of Active Cases per Overall Cases'
+)
+st.altair_chart(heatmap, use_container_width=True)
+
+# Bubble Chart 
+bubble_chart = alt.Chart(filtered_df).mark_circle().encode(
+    x='cases',
+    y='recovered',
+    size='population',
+    color='continent',
+    tooltip=['country', 'cases', 'deaths', 'population', 'count()', 'recovered', 'critical', 'active', 'casesPerOneMillion', 'deathsPerOneMillion', 'tests', 'testsPerOneMillion', 'population', 'oneCasePerPeople', 'oneDeathPerPeople', 'oneTestPerPeople']
+).properties(
+    title='Bubble Chart of Cases vs. Recovered by continent and Population Size'
+)
+st.altair_chart(bubble_chart, use_container_width=True)
+
+# 3D Scatter Plot 
+import plotly.express as px
+fig = px.scatter_3d(filtered_df, x='cases', y='deaths', z='recovered', color='continent', hover_data=['country', 'cases', 'deaths', 'population', 'recovered', 'critical', 'active', 'casesPerOneMillion', 'deathsPerOneMillion', 'tests', 'testsPerOneMillion', 'population', 'oneCasePerPeople', 'oneDeathPerPeople', 'oneTestPerPeople']) 
+fig.update_layout(title='3D Scatter Plot of COVID-19 Cases, Deaths, and Recovered by continent') 
+# Display Plot in Streamlit 
+st.plotly_chart(fig)
+
+# Pair Plot 
+fig = px.scatter_matrix(filtered_df, dimensions=['cases', 'deaths', 'recovered', 'critical', 'active', 'tests', 'population'], color='continent', 
+                        title='Pair Plot of COVID-19 Data') 
+# Display Plot in Streamlit 
+st.plotly_chart(fig)
+
+# Cluster Map 
+fig = px.scatter_geo(filtered_df, locations='country', locationmode='country names', color='continent', hover_name='country', size='cases', projection='natural earth', title='Cluster Map of COVID-19 Data by Case numbers') 
+fig.update_layout(mapbox_style="carto-positron", title='Cluster Map of COVID-19 Data by Case numbers', height=600) 
+# Display Plot in Streamlit 
+st.plotly_chart(fig)
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Facet Grid 
+fig_facet = px.scatter(filtered_df, x='cases', y='deaths', color='continent', facet_col='continent', title='Facet Grid of Cases per Deaths by Continent')
+st.plotly_chart(fig_facet)
+
+# Joint Plot (scatter plot with marginal histograms)
+fig_joint = px.scatter(filtered_df, x='tests', y='critical', color='continent', marginal_x='histogram', marginal_y='histogram', title='Joint Plot of Critical Cases per Tests by Continent')
+st.plotly_chart(fig_joint)
